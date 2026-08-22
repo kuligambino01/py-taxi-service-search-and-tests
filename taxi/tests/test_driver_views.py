@@ -14,9 +14,10 @@ def create_drivers(count):
 
 class TestDriverListView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
 
         self.url = reverse("taxi:driver-list")
 
@@ -47,9 +48,10 @@ class TestDriverListView(TestCase):
     def test_search_user_by_username(self):
         self.client.force_login(self.user)
         create_drivers(6)
-        main_driver = get_user_model().objects.create_user(username="cwelcio",
-                                                           password="cwelcio123",
-                                                           license_number="QWE54321")
+        main_driver = get_user_model().objects.create_user(
+            username="cwelcio",
+            password="cwelcio123",
+            license_number="QWE54321")
 
         response = self.client.get(self.url, {"username": "CWELCIO"})
         drivers = response.context["driver_list"]
@@ -102,9 +104,10 @@ class TestDriverListView(TestCase):
 
 class TestDriverDetailView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
         self.url = reverse("taxi:driver-detail", kwargs={"pk": self.user.pk})
 
     def test_logged_user_can_access(self):
@@ -144,9 +147,10 @@ class TestDriverDetailView(TestCase):
 
 class TestDriverCreateView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
         self.url = reverse("taxi:driver-create")
 
     def test_logged_user_can_access(self):
@@ -172,12 +176,14 @@ class TestDriverCreateView(TestCase):
     def test_create_of_driver(self):
         self.client.force_login(self.user)
 
-        response = self.client.post(self.url, {"username": "Tom",
-                                               "password1": "StrongPassword123!",
-                                               "password2": "StrongPassword123!",
-                                               "license_number": "QWE54321",
-                                               "first_name": "tomek",
-                                               "last_name": "tomeczek"})
+        response = self.client.post(
+            self.url,
+            {"username": "Tom",
+             "password1": "StrongPassword123!",
+             "password2": "StrongPassword123!",
+             "license_number": "QWE54321",
+             "first_name": "tomek",
+             "last_name": "tomeczek"})
 
         driver = get_user_model().objects.get(username="Tom")
 
@@ -186,23 +192,29 @@ class TestDriverCreateView(TestCase):
         self.assertEqual(driver.license_number, "QWE54321")
         self.assertEqual(driver.first_name, "tomek")
         self.assertEqual(driver.last_name, "tomeczek")
-        self.assertRedirects(response, reverse("taxi:driver-detail", kwargs={"pk": driver.pk}))
+        self.assertRedirects(
+            response,
+            reverse("taxi:driver-detail",
+                    kwargs={"pk": driver.pk}))
 
     def test_creation_of_driver_with_wrong_data(self):
         self.client.force_login(self.user)
 
-        response = self.client.post(self.url, {"username": "Tom",
-                                               "password1": "StrongPassword123!",
-                                               "password2": "StrongPassword123!",
-                                               "license_number": "ABC12345",
-                                               "first_name": "tomek",
-                                               "last_name": "tomeczek"})
+        response = self.client.post(
+            self.url,
+            {"username": "Tom",
+             "password1": "StrongPassword123!",
+             "password2": "StrongPassword123!",
+             "license_number": "ABC12345",
+             "first_name": "tomek",
+             "last_name": "tomeczek"})
         form = response.context["form"]
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(form.is_valid())
-        self.assertFalse(get_user_model().objects.filter(username="Tom").exists())
-
+        self.assertFalse(
+            get_user_model().objects.filter(username="Tom").exists()
+        )
         self.assertIn("license_number", form.errors)
 
 
@@ -261,9 +273,11 @@ class TestDriverDeleteView(TestCase):
 
 class TestDriverLicenseUpdateView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345"
+        )
         self.url = reverse("taxi:driver-update", kwargs={"pk": self.user.pk})
 
     def test_logged_user_can_access(self):

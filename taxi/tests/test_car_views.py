@@ -7,11 +7,14 @@ from taxi.models import Car, Manufacturer
 
 class TestCarListView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
-        self.manufacturer = Manufacturer.objects.create(name="Porsche",
-                                                        country="Germany", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345"
+        )
+        self.manufacturer = Manufacturer.objects.create(
+            name="Porsche",
+            country="Germany", )
 
         self.url = reverse("taxi:car-list")
 
@@ -122,11 +125,14 @@ class TestCarListView(TestCase):
 
 class TestCarCreateView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
-        self.manufacturer = Manufacturer.objects.create(name="BMW",
-                                                        country="Germany", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345"
+        )
+        self.manufacturer = Manufacturer.objects.create(
+            name="BMW",
+            country="Germany", )
         self.url = reverse("taxi:car-create")
 
     def test_logged_user_can_access(self):
@@ -147,10 +153,13 @@ class TestCarCreateView(TestCase):
 
         self.assertEqual(Car.objects.count(), 0)
 
-        response = self.client.post(self.url, {"model": "M5",
-                                               "manufacturer": self.manufacturer.pk,
-                                               "drivers": [self.user.pk]
-                                               })
+        response = self.client.post(
+            self.url,
+            {"model": "M5",
+             "manufacturer": self.manufacturer.pk,
+             "drivers": [self.user.pk]
+             }
+        )
 
         car = Car.objects.get(model="M5")
 
@@ -166,16 +175,23 @@ class TestCarCreateView(TestCase):
 
 class TestCarUpdateView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
-        self.manufacturer = Manufacturer.objects.create(name="BMW",
-                                                        country="Germany", )
-        self.car = Car.objects.create(model="X5",
-                                      manufacturer=self.manufacturer, )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345"
+        )
+        self.manufacturer = Manufacturer.objects.create(
+            name="BMW",
+            country="Germany"
+        )
+        self.car = Car.objects.create(
+            model="X5",
+            manufacturer=self.manufacturer, )
         self.car.drivers.add(self.user)
 
-        self.url = reverse("taxi:car-update", kwargs={"pk": self.car.pk})
+        self.url = reverse(
+            "taxi:car-update",
+            kwargs={"pk": self.car.pk})
 
     def test_logged_user_can_access(self):
         self.client.force_login(self.user)
@@ -212,9 +228,11 @@ class TestCarUpdateView(TestCase):
     def test_updating_with_incorrect_data(self):
         self.client.force_login(self.user)
 
-        response = self.client.post(self.url, {"model": "ALPINA M3",
-                                               "manufacturer": self.manufacturer.pk,
-                                               "drivers": ""})
+        response = self.client.post(
+            self.url,
+            {"model": "ALPINA M3",
+             "manufacturer": self.manufacturer.pk,
+             "drivers": ""})
         self.car.refresh_from_db()
 
         form = response.context["form"]
@@ -230,13 +248,16 @@ class TestCarUpdateView(TestCase):
 
 class TestCarDeleteView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
-        self.manufacturer = Manufacturer.objects.create(name="Opel",
-                                                        country="Germany")
-        self.car = Car.objects.create(model="Zafira",
-                                      manufacturer=self.manufacturer)
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
+        self.manufacturer = Manufacturer.objects.create(
+            name="Opel",
+            country="Germany")
+        self.car = Car.objects.create(
+            model="Zafira",
+            manufacturer=self.manufacturer)
 
         self.car.drivers.add(self.user)
 
@@ -268,15 +289,18 @@ class TestCarDeleteView(TestCase):
 
 class TestCarDetailView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
 
-        self.manufacturer = Manufacturer.objects.create(name="Toyota",
-                                                        country="Japan", )
+        self.manufacturer = Manufacturer.objects.create(
+            name="Toyota",
+            country="Japan", )
 
-        self.car = Car.objects.create(model="Aygo",
-                                      manufacturer=self.manufacturer)
+        self.car = Car.objects.create(
+            model="Aygo",
+            manufacturer=self.manufacturer)
 
         self.car.drivers.add(self.user)
 
@@ -327,15 +351,20 @@ class TestCarDetailView(TestCase):
 
 class TestToggleAssignToCar(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
-        self.manufacturer = Manufacturer.objects.create(name="BMW",
-                                                        country="Germany")
-        self.car = Car.objects.create(model="M5",
-                                      manufacturer=self.manufacturer)
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
+        self.manufacturer = Manufacturer.objects.create(
+            name="BMW",
+            country="Germany")
+        self.car = Car.objects.create(
+            model="M5",
+            manufacturer=self.manufacturer)
 
-        self.url = reverse("taxi:toggle-car-assign", kwargs={"pk": self.car.pk})
+        self.url = reverse(
+            "taxi:toggle-car-assign",
+            kwargs={"pk": self.car.pk})
 
     def test_anonymous_redirect_to_login(self):
         response = self.client.post(self.url)
@@ -357,7 +386,9 @@ class TestToggleAssignToCar(TestCase):
             self.user,
             self.car.drivers.all()
         )
-        self.assertRedirects(response, reverse("taxi:car-detail", kwargs={"pk": self.car.pk}))
+        self.assertRedirects(
+            response,
+            reverse("taxi:car-detail", kwargs={"pk": self.car.pk}))
 
     def test_toggle_removes_driver_from_car(self):
         self.client.force_login(self.user)

@@ -7,9 +7,11 @@ from taxi.models import Manufacturer
 
 class ManufacturerListViewTest(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345"
+        )
         self.url = reverse("taxi:manufacturer-list")
 
     def test_logged_user_can_access(self):
@@ -25,20 +27,6 @@ class ManufacturerListViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
 
-    # def test_context_of_list(self):
-    #     self.client.force_login(self.user)
-    #     bmw = Manufacturer.objects.create(name="BMW",
-    #                                       country="Germany")
-    #     audi = Manufacturer.objects.create(name="Audi",
-    #                                        country="Germany")
-    #
-    #     response = self.client.get(self.url)
-    #     manufacturers = response.context["manufacturer_list"]
-    # 
-    #     self.assertIn(bmw, manufacturers)
-    #     self.assertIn(audi, manufacturers)
-    #     self.assertEqual(manufacturers.count(), 2)
-
     def test_uses_correct_template(self):
         self.client.force_login(self.user)
 
@@ -47,9 +35,12 @@ class ManufacturerListViewTest(TestCase):
         self.assertTemplateUsed(response, "taxi/manufacturer_list.html")
 
     def test_search_by_name(self):
-        skoda = Manufacturer.objects.create(name="Skoda", country="Czech Republic")
-        bmw = Manufacturer.objects.create(name="BMW", country="Germany")
-        audi = Manufacturer.objects.create(name="Audi", country="Germany")
+        skoda = Manufacturer.objects.create(name="Skoda",
+                                            country="Czech Republic")
+        bmw = Manufacturer.objects.create(name="BMW",
+                                          country="Germany")
+        audi = Manufacturer.objects.create(name="Audi",
+                                           country="Germany")
 
         self.client.force_login(self.user)
 
@@ -63,9 +54,12 @@ class ManufacturerListViewTest(TestCase):
         self.assertNotIn(audi, manufacturers)
 
     def test_without_search_returns_all_manufacturers(self):
-        skoda = Manufacturer.objects.create(name="Skoda", country="Czech Republic")
-        bmw = Manufacturer.objects.create(name="BMW", country="Germany")
-        audi = Manufacturer.objects.create(name="Audi", country="Germany")
+        skoda = Manufacturer.objects.create(name="Skoda",
+                                            country="Czech Republic")
+        bmw = Manufacturer.objects.create(name="BMW",
+                                          country="Germany")
+        audi = Manufacturer.objects.create(name="Audi",
+                                           country="Germany")
 
         self.client.force_login(self.user)
 
@@ -97,67 +91,14 @@ class ManufacturerListViewTest(TestCase):
         self.assertEqual(page_obj.paginator.num_pages, 2)
 
 
-
 class TestManufacturerCreateView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345",
+        )
         self.url = reverse("taxi:manufacturer-create")
-
-
-    def test_logged_user_can_access(self):
-        self.client.force_login(self.user)
-
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, 200)
-
-
-    def test_anonymous_redirect_to_login(self):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response ,f"{reverse('login')}?next={self.url}")
-
-    def test_successful_creation_manufacturer(self):
-        self.client.force_login(self.user)
-
-        self.assertEqual(Manufacturer.objects.count(), 0)
-
-        response = self.client.post(self.url,{"name": "BMW",
-                                              "country": "Germany"})
-        manufacturer = Manufacturer.objects.get(name="BMW")
-
-        self.assertTrue(Manufacturer.objects.filter(name="BMW",
-                                                    country="Germany",).exists()
-                                                    )
-        self.assertRedirects(response, reverse("taxi:manufacturer-list"))
-        self.assertEqual(Manufacturer.objects.count(), 1)
-        self.assertEqual(manufacturer.name, "BMW")
-        self.assertEqual(manufacturer.country, "Germany")
-
-    def test_invalid_data_does_not_create_manufacturer(self):
-        self.client.force_login(self.user)
-
-        self.assertEqual(Manufacturer.objects.count(), 0)
-
-        response = self.client.post(self.url, {"name": "", "country": ""},)
-        form = response.context["form"]
-
-        self.assertEqual(Manufacturer.objects.count(), 0)
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(form.is_valid())
-
-
-class TestManufacturerUpdateView(TestCase):
-    def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
-        self.manufacturer = Manufacturer.objects.create(name="BMW",
-                                                        country="Germany",)
-        self.url = reverse("taxi:manufacturer-update", kwargs={"pk": self.manufacturer.pk})
 
     def test_logged_user_can_access(self):
         self.client.force_login(self.user)
@@ -172,6 +113,59 @@ class TestManufacturerUpdateView(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
 
+    def test_successful_creation_manufacturer(self):
+        self.client.force_login(self.user)
+
+        self.assertEqual(Manufacturer.objects.count(), 0)
+
+        response = self.client.post(self.url, {"name": "BMW",
+                                               "country": "Germany"})
+        manufacturer = Manufacturer.objects.get(name="BMW")
+
+        self.assertTrue(Manufacturer.objects.filter(
+            name="BMW",
+            country="Germany", ).exists())
+        self.assertRedirects(response, reverse("taxi:manufacturer-list"))
+        self.assertEqual(Manufacturer.objects.count(), 1)
+        self.assertEqual(manufacturer.name, "BMW")
+        self.assertEqual(manufacturer.country, "Germany")
+
+    def test_invalid_data_does_not_create_manufacturer(self):
+        self.client.force_login(self.user)
+
+        self.assertEqual(Manufacturer.objects.count(), 0)
+
+        response = self.client.post(self.url, {"name": "", "country": ""}, )
+        form = response.context["form"]
+
+        self.assertEqual(Manufacturer.objects.count(), 0)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(form.is_valid())
+
+
+class TestManufacturerUpdateView(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
+        self.manufacturer = Manufacturer.objects.create(name="BMW",
+                                                        country="Germany", )
+        self.url = reverse("taxi:manufacturer-update",
+                           kwargs={"pk": self.manufacturer.pk})
+
+    def test_logged_user_can_access(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_anonymous_redirect_to_login(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
 
     def test_updating_existing_manufacturer(self):
         self.client.force_login(self.user)
@@ -198,13 +192,15 @@ class TestManufacturerUpdateView(TestCase):
         self.assertEqual(self.manufacturer.country, "Germany")
         self.assertEqual(response.status_code, 200)
 
+
 class TestManufacturerDeleteView(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user(username="test",
-                                                         password="test123",
-                                                         license_number="ABC12345", )
+        self.user = get_user_model().objects.create_user(
+            username="test",
+            password="test123",
+            license_number="ABC12345", )
         self.manufacturer = Manufacturer.objects.create(name="Audi",
-                                                        country="Germany",)
+                                                        country="Germany", )
 
         self.url = reverse("taxi:manufacturer-delete",
                            kwargs={"pk": self.manufacturer.pk})
@@ -228,6 +224,8 @@ class TestManufacturerDeleteView(TestCase):
 
         response = self.client.post(self.url)
 
-        self.assertFalse(Manufacturer.objects.filter(pk=self.manufacturer.pk).exists())
+        self.assertFalse(
+            Manufacturer.objects.filter(pk=self.manufacturer.pk).exists()
+        )
         self.assertEqual(Manufacturer.objects.count(), 0)
         self.assertRedirects(response, reverse("taxi:manufacturer-list"))

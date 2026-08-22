@@ -68,7 +68,8 @@ class TestDriverLicenseUpdateForm(TestCase):
         self.assertTrue(form.is_valid())
 
     def test_with_invalid_data(self):
-        form = DriverLicenseUpdateForm(data={"license_number": "ABC12345ABCSA"})
+        form = DriverLicenseUpdateForm(
+            data={"license_number": "ABC12345ABCSA"})
 
         self.assertFalse(form.is_valid())
         self.assertIn("license_number", form.errors)
